@@ -16,10 +16,9 @@ def driver(request):
         options.add_argument('--disable-dev-shm-usage')
     else:
         options = None
-    wait_time = 7
-    driver = webdriver.Chrome(executable_path=ChromeDriverManager().install(), options=options)
+    driver = webdriver.Chrome(executable_path=ChromeDriverManager('105.0.5195.52').install(), options=options)
     driver.get('https://target-sandbox.my.com/')
     driver.maximize_window()
-    driver.implicitly_wait(wait_time)
+    driver.implicitly_wait(10)
     yield driver
     driver.quit()
