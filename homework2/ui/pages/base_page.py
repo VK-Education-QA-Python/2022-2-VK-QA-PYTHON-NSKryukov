@@ -37,15 +37,6 @@ class BasePage:
     def find(self, locator, timeout=None):
         return self.wait(timeout).until(EC.element_to_be_clickable(locator))
 
-    def existing_of_entity(self, name):
-        return name in self.driver.page_source
-
-    def find_element_index_in_table(self, table_locator, tag_name, element_name) -> int:
-        table = self.driver.find_elements(*table_locator)
-        for index in range(len(table) - 1):
-            if element_name == table[index].get_attribute(tag_name):
-                return index
-
     def find_elements_list(self, locator, timeout=None):
         self.wait(timeout).until(EC.element_to_be_clickable(locator))
         return self.driver.find_elements(*locator)

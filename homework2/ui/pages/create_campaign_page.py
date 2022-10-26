@@ -25,4 +25,5 @@ class CreateCampaignPage(BasePage):
         self.find(locators.CREATE_CAMPAIGN_BUTTON).click()
         self.find(locators.CAMPAIGNS_LIST_TABLE, timeout=30)
         with allure.step('Taking screenshot: campaigns list after creating new campaign'):
-            allure.attach(self.get_png_screenshot(), 'list_state_after_adding_new_campaign', allure.attachment_type.PNG)
+            allure.attach(self.get_png_screenshot(), 'list_state_after_adding_new_campaign',
+                          allure.attachment_type.PNG)

@@ -29,6 +29,11 @@ def temp_dir(request):
     return test_dir
 
 
+@pytest.fixture(scope='session')
+def file_path(repo_root):
+    return os.path.join(repo_root, 'src', 'ad_picture.jpg')
+
+
 @pytest.fixture(scope='function')
 def unique_name():
     unique_name = uuid.uuid1()
@@ -73,4 +78,3 @@ def config(request):
         'vnc': vnc,
         'enable_video': enable_video,
     }
-

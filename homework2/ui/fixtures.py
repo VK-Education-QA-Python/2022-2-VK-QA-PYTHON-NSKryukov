@@ -5,10 +5,33 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
-from webdriver_manager.firefox import GeckoDriverManager
 from ui.pages.base_page import BasePage
 from ui.pages.create_campaign_page import CreateCampaignPage
 from ui.pages.create_segment_page import CreateSegmentPage
+
+
+@pytest.fixture(scope='session')
+def credentials(repo_root):
+    if sys.platform.startswith('win'):
+        credentials = os.path.join(repo_root, 'src\credentials.txt')
+    else:
+        credentials = os.path.join(repo_root, 'src/credentials.txt')
+    with open(credentials, 'r') as file:
+        user = file.readline().strip()
+        password = file.readline().strip()
+    return user, password
+
+
+@pytest.fixture(scope='session')
+def cookies(credentials, config, driver_authorization):
+    driver = driver_authorization
+    driver.get(config['url'])
+    login_page = BasePage(driver)
+    login_page.login(*credentials)
+
+    cookies = driver.get_cookies()
+    driver.quit()
+    return cookies
 
 
 def pytest_configure(config):
@@ -24,8 +47,7 @@ def pytest_configure(config):
     config.base_temp_dir = base_dir
 
 
-@pytest.fixture()
-def driver(config, temp_dir):
+def driver_initialising(config):
     browser = config['browser']
     url = config['url']
     selenoid = config['selenoid']
@@ -52,43 +74,24 @@ def driver(config, temp_dir):
         )
     elif browser == 'chrome':
         driver = webdriver.Chrome(executable_path=ChromeDriverManager('105.0.5195.52').install(), options=options)
-    elif browser == 'firefox':
-        driver = webdriver.Firefox(executable_path=GeckoDriverManager().install())
     else:
         raise RuntimeError(f'Unsupported browser: "{browser}"')
     driver.get(url)
     driver.maximize_window()
+    return driver
+
+
+@pytest.fixture(scope='function')
+def driver(config):
+    driver = driver_initialising(config)
     yield driver
     driver.quit()
 
 
-def get_driver(browser_name, headless=False, selenoid=False, vnc=False, enable_video=False):
-    options = Options()
-    if headless:
-        options.add_argument('--headless')
-        options.add_argument('--disable-dev-shm-usage')
-    if selenoid:
-        capabilities = {
-            "browserName": "chrome",
-            "browserVersion": "105.0",
-            "selenoid:options": {
-                "enableVNC": vnc,
-                "enableVideo": enable_video
-            }
-        }
-        browser = webdriver.Remote(
-            'http://127.0.0.1:4444/wd/hub',
-            options=options,
-            desired_capabilities=capabilities
-        )
-    elif browser_name == 'chrome':
-        browser = webdriver.Chrome(executable_path=ChromeDriverManager('105.0.5195.52').install(), options=options)
-    elif browser_name == 'firefox':
-        browser = webdriver.Firefox(executable_path=GeckoDriverManager().install())
-    else:
-        raise RuntimeError(f'Unsupported browser: "{browser_name}"')
-    browser.maximize_window()
-    return browser
+@pytest.fixture(scope='session')
+def driver_authorization(config):
+    driver = driver_initialising(config)
+    yield driver
 
 
 @pytest.fixture

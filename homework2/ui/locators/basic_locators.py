@@ -15,17 +15,16 @@ class MainPageLocators(BasePageLocators):
     CREATE_CAMPAIGN_BUTTON = (By.XPATH, '//*[contains(@class,"button-module-button") and'
                                         ' contains(@class,"button-module-blue") and'
                                         ' contains(@class,"button-module-button")]')
+    CREATE_CAMPAIGN_BUTTON_PRIMARY = (By.XPATH, '//*[@href="/campaign/new"]')
     TABLE_CONTROLS_MODULE = (By.XPATH, '//*[contains(@class,"tableControls-module-controlsWrap")]')
 
     AUDIENCES_MODULE = (By.XPATH, '//*[@href="/segments"]')
     CREATE_AUDIENCE_BUTTON = (By.XPATH, '//*[@class="button button_submit"]')
+    CREATE_AUDIENCE_BUTTON_PRIMARY = (By.XPATH, '//*[@href="/segments/segments_list/new/"]')
 
-    SEGMENTS_LIST = (By.XPATH, '//*[contains(@href,"/segments/segments_list/")]')
-    DELETE_AUDIENCE_BUTTONS = (By.XPATH, '//*[@type="checkbox"]')
-    ACTIONS_BUTTON = (By.XPATH, '//*[contains(@class,"select-module-selectWrap") and'
-                                ' contains(@class,"segmentsTable-module-controlItem")]')
-    REMOVE_BUTTON = (By.XPATH, '//*[contains(@class,"optionsList-module-option") and'
-                               ' contains(@class,"optionsList-module-hasScroll")]')
+    COMPANY_SEARCH_INPUT = (By.XPATH, '//input[@type="text"]')
+    SELECT_ALL_BUTTON = (By.XPATH, '//*[contains(@class,"optionListTitle-module-controls")]')
+    ELEMENTS_CAMPAIGNS_LIST = (By.XPATH, '//*[contains(@class,"nameCell-module-campaignNameLink")]')
 
 
 class CreateCampaignPageLocators(BasePageLocators):
@@ -69,3 +68,13 @@ class CreateSegmentPageLocators(BasePageLocators):
     DELETE_GROUP_BUTTON = (By.XPATH, '//*[@data-class-name="RemoveView"]')
     CONFIRM_DELETE_GROUP_BUTTON = (By.XPATH, '//*[@class="button button_confirm-remove button_general"]')
 
+    SEGMENT_SEARCH_INPUT = (By.XPATH, '//input[@type="text"]')
+    POPUP_SELECTED = (By.XPATH, '//*[contains(@class,"suggester-module-option") and'
+                                ' contains(@class,"optionsList-module-option")]')
+
+    SEGMENTS_LIST = (By.XPATH, '//*[contains(@href,"/segments/segments_list/")]')
+    SEGMENT_INTERACTIVE_BUTTON = (By.XPATH, '//*[@type="checkbox"]')
+    ACTIONS_BUTTON = (By.XPATH, '//*[contains(@class,"select-module-selectWrap") and'
+                                ' contains(@class,"segmentsTable-module-controlItem")]')
+    REMOVE_BUTTON = (By.XPATH, '//*[contains(@class,"optionsList-module-option") and'
+                               ' contains(@class,"optionsList-module-hasScroll")]')

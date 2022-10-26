@@ -16,7 +16,8 @@ class CreateSegmentPage(BasePage):
         self.find(locators.CREATE_SEGMENT_BUTTON).click()
         self.find(locators.SEGMENTS_LIST_TABLE)
         with allure.step('Taking screenshot: segments list after creating new segment'):
-            allure.attach(self.get_png_screenshot(), 'list_state_after_adding_new_segment', allure.attachment_type.PNG)
+            allure.attach(self.get_png_screenshot(), 'list_state_after_adding_new_segment',
+                          allure.attachment_type.PNG)
 
     @allure.step('Creating "Vk education" group as data-source')
     def create_vk_group_data(self, locators=locators):
@@ -48,5 +49,22 @@ class CreateSegmentPage(BasePage):
         self.find(locators.DELETE_GROUP_BUTTON).click()
         self.find(locators.CONFIRM_DELETE_GROUP_BUTTON).click()
         with allure.step('Taking screenshot: state while deleting group "Vk education" data-source'):
-            allure.attach(self.get_png_screenshot(), 'list_state_while_deleting_vk_education_source',
+            allure.attach(self.get_png_screenshot(),
+                          'list_state_while_deleting_vk_education_source',
                           allure.attachment_type.PNG)
+
+    @allure.step('Deleting required segment')
+    def delete_segment(self, segment_name):
+        self.put_in_element(self.locators.SEGMENT_SEARCH_INPUT, segment_name)
+        self.find(self.locators.POPUP_SELECTED).click()
+        self.find(self.locators.SEGMENT_INTERACTIVE_BUTTON).click()
+        self.find(self.locators.ACTIONS_BUTTON).click()
+        self.find(self.locators.REMOVE_BUTTON).click()
+        with allure.step('Taking screenshot: segments list while deleting required segment'):
+            allure.attach(self.get_png_screenshot(), 'list_state_while_deleting_required_segment',
+                          allure.attachment_type.PNG)
+
+    def existing_of_segment(self, name):
+        self.put_in_element(self.locators.SEGMENT_SEARCH_INPUT, name)
+        element = self.find(self.locators.POPUP_SELECTED)
+        return element.text == name
