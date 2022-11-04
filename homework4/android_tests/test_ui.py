@@ -10,9 +10,9 @@ class TestMarussiaAndroid(BaseCase):
     def test_search_in_command_line(self):
         self.main_page.skip_preview()
         self.main_page.enter_command('Russia')
-        assert self.main_page.find(self.main_page.locators.TEXT_CARD)
-        self.main_page.swipe_and_click_to_population_button()
-        assert self.main_page.find(self.main_page.locators.FACT_TITLE_FIELD).text == '146 млн.'
+        self.main_page.find(self.main_page.locators.TEXT_CARD)
+        self.main_page.swipe_and_click_to_surface_button()
+        assert self.main_page.find(self.main_page.locators.FACT_TITLE_FIELD).text == '17125191 км²'
 
     @allure.severity('Critical')
     @allure.story('Testing calculator in command line')
@@ -31,10 +31,10 @@ class TestMarussiaAndroid(BaseCase):
         self.main_page.go_to_settings_menu()
         self.settings_page.go_to_news_source()
         self.news_source_page.setting_mail_ru_source()
-        assert self.news_source_page.find(self.news_source_page.locators.CONFIRMATION_SIGN)
+        self.news_source_page.find(self.news_source_page.locators.CONFIRMATION_SIGN)
         self.news_source_page.go_to_main_page()
         self.main_page.enter_command('News')
-        assert self.main_page.find(self.main_page.locators.NEWS_TRACK)
+        self.main_page.find(self.main_page.locators.NEWS_TRACK)
 
     @allure.severity('Critical')
     @allure.story('Testing apk information')

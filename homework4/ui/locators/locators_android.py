@@ -15,7 +15,7 @@ class MainPageANDROIDLocators(BasePageANDROIDLocators):
 
     SUGGESTS_LIST = (By.ID, 'ru.mail.search.electroscope:id/suggests_list')
     LINE_ELEMENTS = (By.XPATH, '//android.widget.TextView')
-    POPULATION_FIELD = (By.XPATH, '//android.widget.TextView[contains(@text, "население россии")]')
+    SURFACE_BUTTON = (By.XPATH, '//android.widget.TextView[contains(@text, "площадь россии")]')
     FACT_TITLE_FIELD = (By.ID, 'ru.mail.search.electroscope:id/item_dialog_fact_card_title')
 
     DIALOG_ITEMS = (By.XPATH, '//*[contains(@resource-id, '
