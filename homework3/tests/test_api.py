@@ -7,7 +7,7 @@ from base import ApiBase
 class TestApi(ApiBase):
     def test_create_and_delete_campaign(self):
         new_campaign = self.create_campaign()
-        assert new_campaign in self.campaigns_list()
+        assert new_campaign == self.get_active_campaign(new_campaign)
         self.delete_campaign(new_campaign)
 
     def test_create_and_delete_segment(self):

@@ -14,8 +14,9 @@ class ApiBase:
         if self.authorize:
             self.api_client.post_login()
 
-    def campaigns_list(self) -> str:
-        return self.api_client.get_all_campaigns_list()
+    def get_active_campaign(self, campaign) -> str:
+        campaign_id = campaign[0]
+        return self.api_client.get_campaign(campaign_id)
 
     def segments_list(self) -> str:
         return self.api_client.get_all_segments_list()

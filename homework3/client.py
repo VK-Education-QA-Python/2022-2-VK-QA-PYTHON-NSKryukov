@@ -3,18 +3,6 @@ from datetime import date
 import json
 
 
-class ApiClientException(Exception):
-    pass
-
-
-class ResponseStatusCodeException(Exception):
-    pass
-
-
-class RespondErrorException(Exception):
-    pass
-
-
 class ApiClient:
 
     def __init__(self):
@@ -35,14 +23,10 @@ class ApiClient:
         }
 
         headers = {
-            'Host': 'auth-ac.my.com',
-            'Origin': 'https://target-sandbox.my.com',
             'Referer': 'https://target-sandbox.my.com/'
         }
 
-        self.session.post(url='https://auth-ac.my.com/auth', headers=headers, data=data)
-        self.session.post(url='https://target-sandbox.my.com/sdc/', cookies=self.session.cookies)
-        self.session.get(url='https://target-sandbox.my.com/auth/mycom', cookies=self.session.cookies)
+        self.session.post(url='https://auth-ac.my.com/auth', headers=headers, data=data) # mc csrf_token mcru
         self.session.get(url='https://target-sandbox.my.com/csrf/', cookies=self.session.cookies)
 
         self.cookies = self.session.cookies
@@ -103,15 +87,10 @@ class ApiClient:
 
         return json.loads(request.content)['items'][0]['id']
 
-    def get_all_campaigns_list(self) -> list[tuple[int, str]]:
+    def get_campaign(self, campaign_id) -> tuple[int, str]:
         response = self.session.get(url='https://target-sandbox.my.com/api/v2/campaigns.json',
-                                    cookies=self.cookies, params='_status__in=active')
-
-        campaigns_list = []
-        for i in json.loads(response.content)['items']:
-            campaigns_list.append((i['id'], i['name']))
-
-        return campaigns_list
+                                    cookies=self.cookies, params=f'_id__in={campaign_id}')
+        return tuple(response.json()['items'][0].values())[0:-1]
 
     def get_all_segments_list(self) -> list[tuple[int, str]]:
         response = self.session.get(url='https://target-sandbox.my.com/api/v2/remarketing/segments.json',
@@ -124,18 +103,19 @@ class ApiClient:
         return segments_list
 
     def post_delete_campaign(self, campaign_id):
-        data = [{"id": int(campaign_id), "status": "deleted"}]
+        data = {
+            'status': 'deleted'
+        }
 
-        request = self.session.post(url='https://target-sandbox.my.com/api/v2/campaigns/mass_action.json',
+        request = self.session.post(url=f'https://target-sandbox.my.com/api/v2/campaigns/{campaign_id}.json',
                                     headers=self.headers, cookies=self.cookies, data=json.dumps(data))
 
         return request.status_code
 
     def post_delete_segment(self, segment_id):
-        data = [{"source_id": int(segment_id), "source_type": "segment"}]
-
-        request = self.session.post(url='https://target-sandbox.my.com/api/v1/remarketing/mass_action/delete.json',
-                                    headers=self.headers, cookies=self.cookies, data=json.dumps(data))
+        request = self.session.delete(
+                                    url=f'https://target-sandbox.my.com/api/v2/remarketing/segments/{segment_id}.json',
+                                    headers=self.headers, cookies=self.cookies)
         return request.status_code
 
     def delete_data_source(self, source_id):
