@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
 import json
 import signal
-import threading
 import os
 from flask import Flask, jsonify, request
 
-import settings
 
 app = Flask(__name__)
 
 mock_data = {}
 
 
+@app.route('/', methods=['GET'])
+def mock_root():
+    return {"This is": "mock"}
+
+
 @app.route('/add_person', methods=['POST'])
-def create_person():
+def create_person_mock():
     person_name = json.loads(request.data)["name"]
     if person_name not in mock_data:
         mock_data[person_name] = {"job": json.loads(request.data)["job"],
@@ -24,15 +27,15 @@ def create_person():
 
 
 @app.route('/get_person_id/<name>', methods=['GET'])
-def get_person_id(name):
-    if person_id := mock_data[name]["person_id"]:
-        return jsonify(person_id), 200
+def get_person_id_mock(name):
+    if name in mock_data:
+        return jsonify(mock_data[name]["person_id"]), 200
     else:
         return jsonify(f'Person {name} is not created'), 400
 
 
 @app.route('/persons/<name>', methods=['PUT'])
-def update_person():
+def update_person_mock(name):
     person_name = json.loads(request.data)["name"]
     if person_name in mock_data:
         mock_data[person_name]["job"] = json.loads(request.data)["job"]
@@ -42,7 +45,7 @@ def update_person():
 
 
 @app.route('/persons/<name>', methods=['DELETE'])
-def delete_person(name):
+def delete_person_mock(name):
     if name in mock_data:
         mock_data.pop(name)
         return jsonify(f'Person {name} deleted'), 200
@@ -51,16 +54,10 @@ def delete_person(name):
 
 
 @app.route('/shutdown')
-def shutdown():
+def shutdown_mock():
     os.kill(os.getpid(), signal.SIGINT)
     return jsonify('Mock is shutting down')
 
 
-def run_mock():
-    server = threading.Thread(target=app.run, kwargs={
-        'host': settings.MOCK_HOST,
-        'port': settings.MOCK_PORT
-    })
-
-    server.start()
-    return server
+if __name__ == "__main__":
+    app.run(host='127.0.0.1', port=8082)

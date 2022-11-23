@@ -9,6 +9,9 @@ import uvicorn
 
 app = FastAPI()
 
+mock_host = '127.0.0.1'
+mock_port = 8082
+
 
 class Person(BaseModel):
     name: str
@@ -31,12 +34,12 @@ def create_person(person: Person):
 
     person_name = person.name
     if person_name not in app_data:
-        response = requests.post('127.0.0.1:8082/add_person',
-                                 json={"name": person_name,
-                                       "job": person.job,
-                                       "person_id": person_id_seq})
-        person_id_seq += 1
-        return response
+
+        app_data[person_name] = {"job": person.job, "person_id": person_id_seq}
+        requests.post(f'http://{mock_host}:{mock_port}/add_person', json={"name": person_name,
+                                                                          "job": person.job,
+                                                                          "person_id": person_id_seq})
+        return json.dumps(app_data[person_name]["person_id"])
     else:
         content = json.dumps(f'Person {person_name} already exists id: {app_data[person_name]["person_id"]}')
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=content)
@@ -46,9 +49,9 @@ def create_person(person: Person):
 def update_person(person: Person, name: str):
     person_name = name
     if person_name in app_data:
-        response = requests.put(f'127.0.0.1:8082/persons/{person_name}',
+        response = requests.put(f'http://{mock_host}:{mock_port}/persons/{person_name}',
                                 json={"name": person_name, "job": person.job})
-        return response
+        return response.json()
     else:
         content = json.dumps(f'Person {name} is not existing')
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=content)
@@ -57,18 +60,8 @@ def update_person(person: Person, name: str):
 @app.get('/get_person_id/{name}', status_code=200)
 def get_person_id(name: str):
     if app_data.get(name):
-        mock_host = '127.0.0.1'
-        mock_port = 8081
-
-        mocked_person_id = None
-        try:
-            response = requests.get(f'http://{mock_host}:{mock_port}/get_person_id/{name}')
-            if response.status_code == 200:
-                mocked_person_id = response.json()
-        except Exception as e:
-            print(f'Unable to get person id from external system:\n{e}')
-
-        return json.dumps(f'Person id is {mocked_person_id}')
+        response = requests.get(f'http://{mock_host}:{mock_port}/get_person_id/{name}')
+        return response.json()
 
     else:
         content = json.dumps(f'Person {name} is not existing')
@@ -78,10 +71,8 @@ def get_person_id(name: str):
 @app.delete('/persons/{name}', status_code=200)
 def delete_person(name: str):
     if name in app_data:
-        mock_host = '127.0.0.1'
-        mock_port = 8081
         response = requests.delete(f'http://{mock_host}:{mock_port}/persons/{name}')
-        return response
+        return response.json()
     else:
         content = json.dumps(f'Person {name} is not existing')
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content=content)
