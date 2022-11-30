@@ -44,16 +44,10 @@ class MysqlClient:
                            f'(`data_name`, `amount`) values ("{info_name}", "{info[info_name]}")')
 
     def write_data_to_requests_amount_by_type_table(self, info):
-        self.write_amount_to_table(info=info, info_name='get_requests_amount',
-                                   table_name='requests_amount_by_type')
-        self.write_amount_to_table(info=info, info_name='post_requests_amount',
-                                   table_name='requests_amount_by_type')
-        self.write_amount_to_table(info=info, info_name='head_requests_amount',
-                                   table_name='requests_amount_by_type')
-        self.write_amount_to_table(info=info, info_name='put_requests_amount',
-                                   table_name='requests_amount_by_type')
-        self.write_amount_to_table(info=info, info_name='other_requests_amount',
-                                   table_name='requests_amount_by_type')
+        requests_amount_list = ['get_requests_amount', 'post_requests_amount', 'head_requests_amount',
+                                'put_requests_amount', 'other_requests_amount']
+        for i in requests_amount_list:
+            self.write_amount_to_table(info=info, info_name=i, table_name='requests_amount_by_type')
 
     def write_most_frequent_requests(self, lines_amount, info):
         items_list = list(info['most_frequent_requests'].items())
@@ -77,22 +71,6 @@ class MysqlClient:
                                f'"{items_list[i][1].split()[0]}", '
                                f'"{items_list[i][1].split()[1]}")')
 
-    def get_requests_amount(self, **filters):
+    def get_table(self, table):
         self.session.commit()
-        return self.session.query(RequestsAmountModel).filter_by(**filters).all()
-
-    def get_requests_amount_by_type(self, **filters):
-        self.session.commit()
-        return self.session.query(RequestsAmountByTypeModel).filter_by(**filters).all()
-
-    def get_most_frequent_requests(self, **filters):
-        self.session.commit()
-        return self.session.query(MostFrequentRequestsModel).filter_by(**filters).all()
-
-    def get_highest_request_with_4xx_code(self, **filters):
-        self.session.commit()
-        return self.session.query(HighestRequestWith4XXCodeModel).filter_by(**filters).all()
-
-    def get_most_frequent_users_with_5xx_code(self, **filters):
-        self.session.commit()
-        return self.session.query(MostFrequentUsersWith5XXCodeModel).filter_by(**filters).all()
+        return self.execute_query(f'select * from {table}', fetch=True)
