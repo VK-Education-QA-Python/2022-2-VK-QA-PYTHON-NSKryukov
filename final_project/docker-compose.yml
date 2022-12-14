@@ -1,0 +1,49 @@
+version: '2.1'
+
+services:
+  mysql:
+    image: "mysql_db:latest"
+    container_name: "mysql_container"
+    hostname: "mysql_host"
+    healthcheck:
+      test: [ "CMD", "mysql", "-h127.0.0.1", "-utest_qa", "-pqa_test" ]
+      start_period: 5s
+      interval: 2s
+      timeout: 20s
+      retries: 30
+    networks:
+      - application_test
+    environment:
+      MYSQL_ROOT_PASSWORD: '0000'
+    ports:
+      - 3306:3306
+
+  mock:
+    image: "app_mock:latest"
+    container_name: "mock_container"
+    ports:
+      - 8083:8083
+    hostname: "mock_host"
+    networks:
+      - application_test
+    depends_on:
+      - mysql
+
+  app:
+    image: "myapp:latest"
+    container_name: "app_container"
+    hostname: "app_host"
+    ports:
+      - 8082:8080
+    volumes:
+      - .\app_config:/home
+    command: "/app/myapp --config=/home/app_config"
+    networks:
+      - application_test
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+networks:
+  application_test:
+    external: true
